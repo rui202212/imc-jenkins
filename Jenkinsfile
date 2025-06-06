@@ -1,14 +1,23 @@
 pipeline {
     agent any
     
+    tools {
+        nodejs 'nodejs23' // Utilisation de Node.js configuré dans Jenkins
+    }
+
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
     
-    stages {
-        stage('Test') {
+    stage('Install Dependencies') {
             steps {
                 sh 'npm install'
+            }
+        }
+
+    stages {
+        stage('Run Tests') {
+            steps {
                 sh 'npm test'
             }
         }

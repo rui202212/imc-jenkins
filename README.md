@@ -29,3 +29,10 @@ Quand le serveur est démarré, utiliser un url comme suit:
 jest
 ```
 
+## Pour installer de Jenkins en mode docker
+```sh
+docker run --privileged -u root --name jenkins3 -p 8080:8080 -p 50000:50000 \
+-v voljen2:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock \
+jenkins/jenkins:latest
+```
+
