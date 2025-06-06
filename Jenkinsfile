@@ -9,13 +9,14 @@ pipeline {
         DOCKER_HUB_CREDENTIALS = credentials('Docker Hub Credentials') // Nom des credentials Docker Hub
     }
     
-    stage('Install Dependencies') {
+
+    stages {
+        stage('Install Dependencies') {
             steps {
                 sh 'npm install'
             }
         }
-
-    stages {
+        
         stage('Run Tests') {
             steps {
                 sh 'npm test'
