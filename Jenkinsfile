@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('dockerhub')
+        DOCKER_HUB_CREDENTIALS = credentials('Docker Hub Credentials') // Nom des credentials Docker Hub
     }
     
     stage('Install Dependencies') {
