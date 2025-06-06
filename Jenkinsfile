@@ -1,13 +1,11 @@
 pipeline {
     agent any
     
-    tools {
-        nodejs 'nodejs23' // Utilisation de Node.js configuré dans Jenkins
-    }
-
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('Docker Hub Credentials') // Nom des credentials Docker Hub
-    }
+        IMAGE_NAME = 'matougong/imc-calculator'
+        IMAGE_TAG = 'latest'
+        DOCKER_HUB_CREDENTIALS = 'dockerhub' // ID des credentials dans Jenkins    
+        }
     
 
     stages {
@@ -16,7 +14,7 @@ pipeline {
                 sh 'npm install'
             }
         }
-        
+
         stage('Run Tests') {
             steps {
                 sh 'npm test'
@@ -26,18 +24,40 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${env.DOCKER_HUB_USERNAME}/imc-calculator")
+                    sh "docker build --no-cache -t ${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
             }
         }
         
-        stage('Push to Docker Hub') {
+        stage('Login to Docker Hub') {
+            steps {
+                // Meilleure pratique : utilisation de withCredentials pour masquer les infos sensibles
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub', 
+                        usernameVariable: 'DOCKER_HUB_USR', 
+                        passwordVariable: 'DOCKER_HUB_PSW'
+                    )
+                ]) {
+                    sh 'echo $DOCKER_HUB_PSW | docker login -u $DOCKER_HUB_USR --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        docker.image("${env.DOCKER_HUB_USERNAME}/imc-calculator").push()
-                    }
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
                 }
+            }
+        }
+    }
+    
+    // Nettoyage après execution
+    post {
+        always {
+            script {
+                sh 'docker logout' // Sécurité : déconnexion systématique
             }
         }
     }
