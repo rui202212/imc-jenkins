@@ -1,5 +1,9 @@
 pipeline {
     agent any
+
+    tools {
+        nodejs 'nodejs23' // Utilisation de Node.js configuré dans Jenkins
+    }
     
     environment {
         IMAGE_NAME = 'matougong/imc-calculator'
